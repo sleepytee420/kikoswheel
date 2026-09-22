@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kiko's Crimson Wheel</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    min-height: 100%;
+    background: #07141c;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #f4eee9;
+    overflow-x: hidden;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(3, 10, 15, 0.05) 0%,
+            rgba(3, 10, 15, 0.10) 38%,
+            rgba(3, 10, 15, 0.35) 58%,
+            rgba(3, 10, 15, 0.58) 100%
+        ),
+        url("background.jpg") center center / cover fixed no-repeat,
+        #07141c;
+}
+
+/* subtle dark overlay */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(
+            circle at 74% 45%,
+            rgba(125, 0, 18, 0.08),
+            transparent 35%
+        ),
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,0.05),
+            rgba(0,0,0,0.22)
+        );
+    z-index: 0;
+}
+
+.page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 38px 5vw 38px 43vw;
+}
+
+.content {
+    width: min(720px, 100%);
+    text-align: center;
+}
+
+/* TITLE */
+
+.title-small {
+    font-size: clamp(30px, 3vw, 50px);
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #e9e2de;
+    text-shadow: 0 0 15px rgba(255,255,255,0.08);
+}
+
+.title-main {
+    margin-top: -3px;
+    font-size: clamp(45px, 5vw, 78px);
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: #c5142b;
+    text-shadow:
+        0 0 8px rgba(255, 25, 50, 0.55),
+        0 0 22px rgba(145, 0, 20, 0.45);
+}
+
+.subtitle {
+    margin-top: 16px;
+    color: #d9d0cb;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    font-size: 15px;
+}
+
+.divider {
+    width: 240px;
+    height: 1px;
+    margin: 16px auto 22px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #8d1725,
+        #cf2036,
+        #8d1725,
+        transparent
+    );
+}
+
+/* WHEEL AREA */
+
+.wheel-wrap {
+    position: relative;
+    width: min(560px, 78vw);
+    aspect-ratio: 1;
+    margin: 0 auto;
+    filter: drop-shadow(0 0 20px rgba(188, 0, 29, 0.35));
+}
+
+.pointer {
+    position: absolute;
+    z-index: 20;
+    left: 50%;
+    top: -17px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 17px solid transparent;
+    border-right: 17px solid transparent;
+    border-top: 34px solid #f0d5d8;
+    filter:
+        drop-shadow(0 0 5px #ff263f)
+        drop-shadow(0 0 10px #c00020);
+}
+
+.pointer::after {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: -31px;
+    width: 20px;
+    height: 20px;
+    background: #b80f27;
+    transform: rotate(45deg);
+    border: 1px solid #f09aa5;
+}
+
+.wheel-border {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    padding: 9px;
+    background:
+        radial-gradient(circle, transparent 67%, rgba(255,35,60,.22) 68%, transparent 72%),
+        linear-gradient(145deg, #f23b51, #6e0714, #ef233c);
+    box-shadow:
+        0 0 0 3px #3b0710,
+        0 0 18px rgba(255, 20, 48, 0.85),
+        0 0 45px rgba(130, 0, 20, 0.45);
+}
+
+#wheel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+
+    background:
+        conic-gradient(
+            from -20deg,
+            #16080c 0deg 40deg,
+            #2a090f 40deg 80deg,
+            #13080b 80deg 120deg,
+            #28090f 120deg 160deg,
+            #14080b 160deg 200deg,
+            #29090f 200deg 240deg,
+            #14080b 240deg 280deg,
+            #27090e 280deg 320deg,
+            #15080b 320deg 360deg
+        );
+
+    transition: transform 8s cubic-bezier(.12,.67,.08,1);
+    box-shadow:
+        inset 0 0 45px rgba(0,0,0,.9),
+        inset 0 0 8px rgba(255,60,75,.5);
+}
+
+/* slice separator lines */
+#wheel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+        repeating-conic-gradient(
+            from -20deg,
+            transparent 0deg 39.5deg,
+            rgba(226, 38, 59, .8) 39.5deg 40deg
+        );
+    pointer-events: none;
+}
+
+.label {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    top: 50%;
+    width: 120px;
+    height: 44%;
+    margin-left: -60px;
+    margin-top: -44%;
+    transform-origin: 50% 100%;
+    text-align: center;
+    padding-top: 24px;
+
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: .4px;
+    color: #f6ecec;
+    text-shadow:
+        0 1px 3px #000,
+        0 0 5px rgba(255,255,255,.12);
+}
+
+.label .icon {
+    display: block;
+    font-size: 22px;
+    margin-bottom: 5px;
+    color: #df4051;
+}
+
+.label:nth-child(1) { transform: rotate(0deg); }
+.label:nth-child(2) { transform: rotate(40deg); }
+.label:nth-child(3) { transform: rotate(80deg); }
+.label:nth-child(4) { transform: rotate(120deg); }
+.label:nth-child(5) { transform: rotate(160deg); }
+.label:nth-child(6) { transform: rotate(200deg); }
+.label:nth-child(7) { transform: rotate(240deg); }
+.label:nth-child(8) { transform: rotate(280deg); }
+.label:nth-child(9) { transform: rotate(320deg); }
+
+/* CENTER */
+
+.center {
+    position: absolute;
+    z-index: 10;
+    width: 29%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        radial-gradient(circle, #22090e 0%, #0b0709 72%);
+    border: 3px solid #b3142a;
+
+    box-shadow:
+        0 0 0 5px rgba(53, 5, 12, .85),
+        0 0 18px rgba(255, 25, 50, .65),
+        inset 0 0 18px #000;
+}
+
+.center span {
+    font-size: clamp(25px, 3vw, 40px);
+    font-style: italic;
+    color: #efe4df;
+    text-shadow: 0 0 10px rgba(255,255,255,.16);
+}
+
+/* BUTTONS */
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 26px;
+}
+
+.spin-btn {
+    min-width: 205px;
+    padding: 14px 20px 12px;
+
+    border: 1px solid #d1283e;
+    border-radius: 7px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(124, 11, 27, .96),
+            rgba(57, 5, 13, .98)
+        );
+
+    color: #f5eeee;
+    font-family: Georgia, serif;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    font-size: 17px;
+    cursor: pointer;
+
+    box-shadow:
+        inset 0 0 12px rgba(255, 35, 58, .16),
+        0 0 12px rgba(145, 0, 22, .28);
+
+    transition: .2s ease;
+}
+
+.spin-btn:hover {
+    transform: translateY(-2px);
+    border-color: #f14a5f;
+    box-shadow:
+        inset 0 0 14px rgba(255, 35, 58, .25),
+        0 0 18px rgba(200, 0, 30, .42);
+}
+
+.spin-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.price {
+    display: block;
+    margin-top: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #ddd2d2;
+    letter-spacing: .7px;
+}
+
+/* RESULT */
+
+#result {
+    min-height: 54px;
+    margin: 18px auto 0;
+    padding: 13px 20px;
+    width: min(520px, 100%);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-top: 1px solid rgba(173, 25, 45, .35);
+    border-bottom: 1px solid rgba(173, 25, 45, .35);
+
+    font-family: Arial, sans-serif;
+    font-size: 17px;
+    color: #f2e9e9;
+}
+
+#result strong {
+    color: #ef4055;
+}
+
+/* INFO */
+
+.info {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background: rgba(3, 12, 17, .76);
+    border: 1px solid rgba(133, 31, 45, .45);
+    backdrop-filter: blur(8px);
+}
+
+.info-box {
+    padding: 18px 15px;
+    min-height: 145px;
+}
+
+.info-box + .info-box {
+    border-left: 1px solid rgba(133, 31, 45, .35);
+}
+
+.info h3 {
+    color: #e9dddd;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.info p {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #cfc7c7;
+}
+
+.red {
+    color: #d52b42;
+}
+
+/* MOBILE */
+
+@media (max-width: 950px) {
+    body {
+        background-position: 30% center;
+    }
+
+    .page {
+        padding: 35px 20px;
+        justify-content: center;
+        background: rgba(3, 10, 15, .66);
+    }
+
+    .content {
+        width: min(650px, 100%);
+    }
+}
+
+@media (max-width: 600px) {
+    .title-small {
+        font-size: 25px;
+    }
+
+    .title-main {
+        font-size: 42px;
+    }
+
+    .subtitle {
+        letter-spacing: 5px;
+        font-size: 12px;
+    }
+
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .spin-btn {
+        width: min(320px, 100%);
+    }
+
+    .info {
+        grid-template-columns: 1fr;
+    }
+
+    .info-box + .info-box {
+        border-left: 0;
+        border-top: 1px solid rgba(133, 31, 45, .35);
+    }
+
+    .label {
+        font-size: 10px;
+        width: 90px;
+        margin-left: -45px;
+        padding-top: 16px;
+    }
+
+    .label .icon {
+        font-size: 17px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<main class="page">
+
+<div class="content">
+
+    <div class="title-small">Kiko's</div>
+    <div class="title-main">Crimson Wheel</div>
+    <div class="subtitle">Test Your Fate</div>
+
+    <div class="divider"></div>
+
+    <div class="wheel-wrap">
+
+        <div class="pointer"></div>
+
+        <div class="wheel-border">
+
+            <div id="wheel">
+
+                <!--
+                Visual slices are equal size.
+                Actual prize chances are controlled in JavaScript.
+                -->
+
+                <div class="label">
+                    <span class="icon">↻</span>
+                    TRY AGAIN
+                </div>
+
+                <div class="label">
+                    <span class="icon">☎</span>
+                    30 MIN<br>CALL
+                </div>
+
+                <div class="label">
+                    <span class="icon">▶</span>
+                    30 MIN<br>WATCH TOGETHER
+                </div>
+
+                <div class="label">
+                    <span class="icon">✦</span>
+                    5%<br>COUPON
+                </div>
+
+                <div class="label">
+                    <span class="icon">🎙</span>
+                    3 MIN<br>VOICE NOTE
+                </div>
+
+                <div class="label">
+                    <span class="icon">%</span>
+                    20%<br>COUPON
+                </div>
+
+                <div class="label">
+                    <span class="icon">🎮</span>
+                    30 MIN<br>GAMING SESSION
+                </div>
+
+                <div class="label">
+                    <span class="icon">%</span>
+                    50%<br>COUPON
+                </div>
+
+                <div class="label">
+                    <span class="icon">🎙</span>
+                    1 MIN<br>VOICE NOTE
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="center">
+            <span>Kiko</span>
+        </div>
+
+    </div>
+
+    <div class="buttons">
+
+        <button class="spin-btn" id="regularBtn" onclick="spinWheel(false)">
+            Regular Spin
+            <span class="price">5 BUFF</span>
+        </button>
+
+        <button class="spin-btn" id="vipBtn" onclick="spinWheel(true)">
+            VIP Spin
+            <span class="price">9 BUFF</span>
+        </button>
+
+    </div>
+
+    <div id="result">
+        Choose your fate.
+    </div>
+
+    <section class="info">
+
+        <div class="info-box">
+            <h3>How It Works</h3>
+            <p>
+                <span class="red">01.</span> Choose your spin<br>
+                <span class="red">02.</span> Spin the wheel<br>
+                <span class="red">03.</span> Accept your fate<br>
+                <span class="red">04.</span> Claim your reward
+            </p>
+        </div>
+
+        <div class="info-box">
+            <h3>VIP Spin</h3>
+            <p>
+                VIP doubles all time-based prizes.<br><br>
+                Calls, Watch Together, Gaming Sessions
+                and Voice Notes are doubled.
+            </p>
+        </div>
+
+        <div class="info-box">
+            <h3>Rules</h3>
+            <p>
+                Adding Socials for Discord is required.<br>
+                Wheel is spun on Discord.<br>
+                Rewards must be claimed within 5 days.<br>
+                Standard service rules still apply.
+            </p>
+        </div>
+
+    </section>
+
+</div>
+
+</main>
+
+<script>
+
+/*
+==========================================
+KIKO'S CRIMSON WHEEL
+==========================================
+
+FINAL ODDS:
+
+Try Again ................ 18%
+30 Min Call .............. 16%
+30 Min Watch Together .... 16%
+30 Min Gaming Session .... 16%
+5% Coupon ................ 13%
+20% Coupon ...............  9%
+1 Min Voice Note .........  6%
+3 Min Voice Note .........  4%
+50% Coupon ...............  2%
+
+TOTAL .................... 100%
+
+Try Again cannot occur twice in a row.
+VIP doubles time-based prizes.
+==========================================
+*/
+
+
+const prizes = [
+
+    {
+        name: "Try Again",
+        weight: 18,
+        wheelIndex: 0,
+        vip: "Try Again"
+    },
+
+    {
+        name: "30 Min Call",
+        weight: 16,
+        wheelIndex: 1,
+        vip: "60 Min Call"
+    },
+
+    {
+        name: "30 Min Watch Together",
+        weight: 16,
+        wheelIndex: 2,
+        vip: "60 Min Watch Together"
+    },
+
+    {
+        name: "5% Coupon",
+        weight: 13,
+        wheelIndex: 3,
+        vip: "5% Coupon"
+    },
+
+    {
+        name: "3 Min Voice Note",
+        weight: 4,
+        wheelIndex: 4,
+        vip: "6 Min Voice Note"
+    },
+
+    {
+        name: "20% Coupon",
+        weight: 9,
+        wheelIndex: 5,
+        vip: "20% Coupon"
+    },
+
+    {
+        name: "30 Min Gaming Session",
+        weight: 16,
+        wheelIndex: 6,
+        vip: "60 Min Gaming Session"
+    },
+
+    {
+        name: "50% Coupon",
+        weight: 2,
+        wheelIndex: 7,
+        vip: "50% Coupon"
+    },
+
+    {
+        name: "1 Min Voice Note",
+        weight: 6,
+        wheelIndex: 8,
+        vip: "2 Min Voice Note"
+    }
+
+];
+
+
+const wheel = document.getElementById("wheel");
+const result = document.getElementById("result");
+const regularBtn = document.getElementById("regularBtn");
+const vipBtn = document.getElementById("vipBtn");
+
+let rotation = 0;
+let spinning = false;
+let previousPrize = null;
+
+
+/*
+Weighted random selection.
+
+If the previous result was Try Again,
+Try Again is removed from the next spin.
+
+The remaining prizes keep their relative
+probability weights.
+*/
+
+function choosePrize() {
+
+    let availablePrizes = prizes;
+
+    if (previousPrize === "Try Again") {
+        availablePrizes = prizes.filter(
+            prize => prize.name !== "Try Again"
+        );
+    }
+
+    const totalWeight = availablePrizes.reduce(
+        (total, prize) => total + prize.weight,
+        0
+    );
+
+    let random = Math.random() * totalWeight;
+
+    for (const prize of availablePrizes) {
+
+        if (random < prize.weight) {
+            return prize;
+        }
+
+        random -= prize.weight;
+    }
+
+    return availablePrizes[availablePrizes.length - 1];
+}
+
+
+function spinWheel(isVIP) {
+
+    if (spinning) return;
+
+    spinning = true;
+
+    regularBtn.disabled = true;
+    vipBtn.disabled = true;
+
+    result.innerHTML = isVIP
+        ? "The VIP wheel is deciding your fate..."
+        : "The wheel is deciding your fate...";
+
+
+    const selectedPrize = choosePrize();
+
+    previousPrize = selectedPrize.name;
+
+
+    /*
+    There are 9 equal visual slices.
+
+    360 / 9 = 40 degrees per slice.
+
+    This calculates the rotation needed
+    to place the selected prize directly
+    underneath the pointer.
+    */
+
+    const degreesPerSlice = 360 / prizes.length;
+
+    const targetPosition =
+        (360 - selectedPrize.wheelIndex * degreesPerSlice) % 360;
+
+    const currentPosition =
+        ((rotation % 360) + 360) % 360;
+
+    const adjustment =
+        (targetPosition - currentPosition + 360) % 360;
+
+
+    /*
+    Five complete rotations +
+    exact landing position.
+
+    CSS makes the animation last 8 seconds.
+    */
+
+    rotation += (360 * 5) + adjustment;
+
+    wheel.style.transform =
+        `rotate(${rotation}deg)`;
+
+
+    setTimeout(() => {
+
+        let finalReward = selectedPrize.name;
+
+        if (isVIP) {
+            finalReward = selectedPrize.vip;
+        }
+
+
+        if (selectedPrize.name === "Try Again") {
+
+            result.innerHTML =
+                `<strong>TRY AGAIN</strong> — Fate gives you another chance.`;
+
+        } else {
+
+            const spinType =
+                isVIP ? "VIP Reward" : "Reward";
+
+            result.innerHTML =
+                `${spinType}: &nbsp;<strong>${finalReward}</strong>`;
+
+        }
+
+
+        spinning = false;
+
+        regularBtn.disabled = false;
+        vipBtn.disabled = false;
+
+    }, 8000);
+
+}
+
+</script>
+
+</body>
+</html>
